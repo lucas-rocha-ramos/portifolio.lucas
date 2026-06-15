@@ -72,105 +72,42 @@
     }
 
     /* ============================================================ */
-    /* APENAS ESTE BLOCO FOI ADICIONADO - AJUSTE DE VÍDEO EM MOBILE */
+    /* APENAS AJUSTE DOS CONTROLES DE MÍDIA DO VÍDEO */
     /* ============================================================ */
+    
+    /* Garante que o iframe do vídeo ocupe todo o espaço do container corretamente */
+    #project-modal-media iframe {
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+      border-radius: 0.75rem !important;
+      background-color: #000 !important;
+    }
+    
+    /* Container da mídia deve ter posição relativa para melhor encapsulamento */
+    #project-modal-media {
+      position: relative !important;
+      background-color: #000 !important;
+    }
+    
+    /* Ajuste para dispositivos móveis - vídeo bem dimensionado */
     @media (max-width: 768px) {
-      /* Força o modal a ficar em coluna e ajusta alturas */
-      #project-modal-box {
-        flex-direction: column !important;
-      }
-      
-      /* Área do vídeo/mídia - MAIOR (70% da altura) */
       #project-modal-media {
-        height: 70vh !important;
-        width: 100% !important;
-        min-height: 60vh !important;
+        min-height: 55vh !important;
       }
       
-      /* Container interno da mídia */
-      #project-modal-media > div {
-        height: 100% !important;
-        padding: 0.5rem !important;
+      #project-modal-media iframe {
+        border-radius: 0.5rem !important;
       }
-      
-      /* Iframe e imagem ocupam todo espaço disponível */
-      #project-modal-media iframe,
-      #project-modal-media img {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: contain !important;
-      }
-      
-      /* Área de detalhes - MENOR (30% da altura) */
-      #project-modal-details {
-        height: auto !important;
-        max-height: 30vh !important;
-        padding: 0.75rem 1rem !important;
-        overflow-y: auto !important;
-      }
-      
-      /* Título menor */
-      #project-modal-title {
-        font-size: 1.25rem !important;
-        margin-bottom: 0.25rem !important;
-      }
-      
-      /* Categoria menor */
-      #project-modal-category {
-        font-size: 0.65rem !important;
-        margin-bottom: 0.25rem !important;
-      }
-      
-      /* Descrição compacta (máximo 2 linhas) */
-      #project-modal-description {
-        font-size: 0.75rem !important;
-        line-height: 1.3 !important;
-        max-height: 2.6rem !important;
-        overflow: hidden !important;
-        display: -webkit-box !important;
-        -webkit-line-clamp: 2 !important;
-        -webkit-box-orient: vertical !important;
-      }
-      
-      /* Sugestão "Veja também" compacta */
-      #project-modal-suggestion {
-        margin-top: 0.25rem !important;
-        padding-top: 0.5rem !important;
-      }
-      
-      #project-modal-suggestion h4 {
-        font-size: 0.6rem !important;
-        margin-bottom: 0.25rem !important;
-      }
-      
-      #project-modal-suggestion-card {
-        padding: 0.4rem !important;
-      }
-      
-      #project-modal-suggestion-card .w-24 {
-        width: 2.5rem !important;
-        height: 2.5rem !important;
-      }
-      
-      #project-modal-suggestion-card .pl-4 {
-        padding-left: 0.5rem !important;
-      }
-      
-      #project-modal-suggestion-card .text-sm {
-        font-size: 0.65rem !important;
-      }
-      
-      #project-modal-suggestion-card .text-\[10px\] {
-        font-size: 0.55rem !important;
-      }
-      
-      /* Botão de fechar um pouco menor */
-      #project-modal > button.absolute {
-        width: 2rem !important;
-        height: 2rem !important;
-        top: 0.5rem !important;
-        right: 0.5rem !important;
-      }
+    }
+    
+    /* Garante que os controles do YouTube/Drive fiquem dentro do canvas */
+    #project-modal-media > div {
+      height: 100% !important;
+      width: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
     }
   </style>
 </head>
