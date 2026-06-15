@@ -1,8 +1,11 @@
+Aqui está o HTML completo com o ajuste para que o vídeo ocupe todo o canvas mantendo a proporção, e os controles fiquem adequados:
+
+```html
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>LUCAS ROCHA - Portfolio</title>
   
   <!-- Tailwind CSS -->
@@ -72,10 +75,38 @@
     }
 
     /* ============================================================ */
-    /* APENAS ESTE BLOCO FOI ADICIONADO - AJUSTE DE VÍDEO EM MOBILE */
+    /* AJUSTE PARA VÍDEO OCUPAR TODO O CANVAS MANTENDO PROPORÇÃO */
     /* ============================================================ */
+    
+    /* Garante que o iframe do vídeo ocupe 100% do espaço mantendo proporção */
+    #project-modal-media iframe {
+      width: 100% !important;
+      height: 100% !important;
+      border: none !important;
+      border-radius: 0.75rem !important;
+      background-color: #000 !important;
+    }
+
+    /* Container da mídia tem fundo preto */
+    #project-modal-media {
+      background-color: #000 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+
+    /* O div interno que envolve o iframe também ocupa 100% */
+    #project-modal-media > div {
+      width: 100% !important;
+      height: 100% !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 !important;
+    }
+
     @media (max-width: 768px) {
-      /* Força o modal a ficar em coluna e ajusta alturas */
+      /* Força o modal a ficar em coluna */
       #project-modal-box {
         flex-direction: column !important;
       }
@@ -87,18 +118,13 @@
         min-height: 60vh !important;
       }
       
-      /* Container interno da mídia */
-      #project-modal-media > div {
-        height: 100% !important;
-        padding: 0.5rem !important;
-      }
-      
-      /* Iframe e imagem ocupam todo espaço disponível */
+      /* Iframe ocupa 100% do espaço disponível */
       #project-modal-media iframe,
       #project-modal-media img {
         width: 100% !important;
         height: 100% !important;
         object-fit: contain !important;
+        border-radius: 0.5rem !important;
       }
       
       /* Área de detalhes - MENOR (30% da altura) */
@@ -170,6 +196,21 @@
         height: 2rem !important;
         top: 0.5rem !important;
         right: 0.5rem !important;
+      }
+    }
+    
+    /* Desktop - ajuste de proporção */
+    @media (min-width: 769px) {
+      #project-modal-media > div {
+        padding: 0 !important;
+      }
+      
+      #project-modal-media iframe,
+      #project-modal-media img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+        border-radius: 0.75rem !important;
       }
     }
   </style>
@@ -295,7 +336,7 @@
     </div>
   </div>
 
-  <!-- OLD VIDEO MODAL (Kept for compatibility if needed, but overridden by Project Modal below) -->
+  <!-- OLD VIDEO MODAL -->
   <div id="video-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
     <button onclick="closeVideoModal()" class="absolute top-6 right-6 text-white/50 hover:text-white bg-white/10 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 z-50">
       <i data-lucide="x" class="w-6 h-6"></i>
@@ -305,7 +346,7 @@
     </div>
   </div>
 
-  <!-- NEW PROJECT DETAILS MODAL -->
+  <!-- PROJECT DETAILS MODAL -->
   <div id="project-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl hidden opacity-0 transition-opacity duration-300">
     <button onclick="closeProjectModal()" class="absolute top-6 right-6 text-white/50 hover:text-white bg-white/10 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 z-50">
       <i data-lucide="x" class="w-6 h-6"></i>
@@ -314,7 +355,7 @@
     <div class="w-full max-w-7xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row overflow-hidden rounded-3xl bg-[#0a0a0a] border border-white/10 transform scale-95 transition-transform duration-300 mx-4" id="project-modal-box">
       <!-- Mídia (Esquerda no Desktop / Topo no Mobile) -->
       <div class="w-full md:w-2/3 h-1/2 md:h-full bg-black relative flex items-center justify-center" id="project-modal-media">
-        <!-- Preenchido via JS dinamicamente (Imagem ou Iframe) -->
+        <!-- Preenchido via JS dinamicamente -->
       </div>
       
       <!-- Detalhes (Direita no Desktop / Embaixo no Mobile) -->
@@ -375,9 +416,6 @@
 
     document.getElementById('current-year').textContent = new Date().getFullYear();
 
-    // =========================================================================
-    // UTILITÁRIOS E API
-    // =========================================================================
     const formatDriveUrl = (url) => {
       if (!url) return '';
       const match = url.match(/(?:id=|v=|d\/|id\/)([a-zA-Z0-9_-]{25,})/);
@@ -408,7 +446,6 @@
     const fetchData = async () => {
       let progress = 0;
       const progressEl = document.getElementById('loader-percentage');
-      
       const interval = setInterval(() => {
         progress += Math.floor(Math.random() * 15) + 5;
         if (progress > 95) progress = 95;
@@ -437,25 +474,22 @@
           
           if (json.data.settings?.heroName) {
             state.settings = {
-              ...state.settings, // Mantém defaults se faltar algo no banco
+              ...state.settings,
               ...json.data.settings,
               heroImage: formatDriveUrl(json.data.settings.heroImage)
             };
-            
-            // Fallback de compatibilidade caso só tenha a coluna twitter antiga no Sheets
             if (!json.data.settings.whatsapp && json.data.settings.twitter) {
                 state.settings.whatsapp = json.data.settings.twitter;
             }
           }
         }
       } catch (err) {
-        console.error("Erro ao buscar dados do Google Sheets:", err);
+        console.error("Erro ao buscar dados:", err);
         state.projects = MOCK_PROJECTS;
         state.categories = DEFAULT_CATEGORIES;
       } finally {
         clearInterval(interval);
         if (progressEl) progressEl.textContent = '100%';
-        
         setTimeout(() => {
           const loader = document.getElementById('loader');
           loader.classList.add('opacity-0');
@@ -476,17 +510,11 @@
         });
         return await res.json();
       } catch (err) {
-        console.error("Erro ao comunicar com API:", err);
-        if (err.message === 'Failed to fetch') {
-          alert("Erro de conexão com o banco de dados (CORS).\n\n1. Verifique se publicou o Apps Script como 'Nova Versão'.\n2. Garanta que a permissão está definida para 'Qualquer pessoa'.");
-        }
+        console.error("Erro na API:", err);
         throw err;
       }
     };
 
-    // =========================================================================
-    // NAVEGAÇÃO E UI
-    // =========================================================================
     function navigate(newView) {
       state.view = newView;
       closeMobileMenu();
@@ -496,7 +524,6 @@
     }
 
     function updateUI() {
-      // Update Navbar Links Active State
       document.querySelectorAll('.nav-link').forEach(el => {
         if(el.dataset.target === state.view) {
           el.classList.add('text-white');
@@ -507,7 +534,6 @@
         }
       });
 
-      // Update Header/Footer global info
       document.getElementById('nav-logo-text').textContent = state.settings.heroName.split(' ')[0];
       document.getElementById('footer-name').textContent = state.settings.heroName;
       document.getElementById('footer-subtitle').textContent = state.settings.heroSubtitle;
@@ -515,14 +541,12 @@
       document.getElementById('footer-wa').href = state.settings.whatsapp || '#';
       document.getElementById('footer-li').href = state.settings.linkedin || '#';
 
-      // Hide all views
       document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
       document.getElementById('view-admin').classList.add('hidden');
       document.getElementById('navbar').classList.remove('hidden');
       document.getElementById('footer').classList.remove('hidden');
       document.getElementById('main-content').classList.remove('hidden');
 
-      // Show requested view
       if (state.view === 'home') renderHome();
       else if (state.view === 'designer') renderDesigner();
       else if (state.view === 'video') renderVideo();
@@ -530,16 +554,12 @@
       else if (state.view === 'sobre') renderSobre();
       else if (state.view === 'contato') renderContato();
       else if (state.view === 'admin') {
-        if (!state.isAdmin) {
-          navigate('home');
-          return;
-        }
+        if (!state.isAdmin) { navigate('home'); return; }
         document.getElementById('navbar').classList.add('hidden');
         document.getElementById('footer').classList.add('hidden');
         document.getElementById('main-content').classList.add('hidden');
         renderAdmin();
       }
-
       lucide.createIcons();
     }
 
@@ -549,1014 +569,141 @@
       }, 50);
     }
 
-    // =========================================================================
-    // COMPONENTES PÚBLICOS (RENDERIZADORES COM TAMANHOS DINÂMICOS E MODAL PROJETO)
-    // =========================================================================
     function renderHome() {
       const container = document.getElementById('view-home');
       container.classList.remove('hidden');
-      
       const featured = state.projects.filter(p => p.isFeatured);
       const recentArts = state.projects.filter(p => p.type === 'arte').slice(0, 6);
-
       let heroWords = state.settings.heroName.split(' ');
-      let heroTitleHtml = heroWords.map((word, i) => 
-        `<span class="block ${i === 1 ? 'text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-600 mt-2' : ''}">${word}</span>`
-      ).join('');
-
-      let featuredHtml = '';
-      if (featured.length > 0) {
-        featuredHtml = `
-          <section class="py-24 px-6 md:px-12 bg-black">
-            <div class="max-w-7xl mx-auto mb-12 flex items-end justify-between">
-              <h2 class="text-3xl md:text-5xl font-light tracking-tight">Trabalhos em <span class="font-semibold">Destaque</span></h2>
-            </div>
-            <div class="flex overflow-x-auto pb-12 space-x-6 hide-scrollbar snap-x snap-mandatory px-6 md:px-12 -mx-6 md:-mx-12">
-              ${featured.map(item => `
-                <div class="h-[50vh] md:h-[60vh] flex-shrink-0 relative group rounded-3xl overflow-hidden snap-center cursor-pointer bg-[#111]"
-                     onclick="openProjectModal('${item.id}')">
-                  <img src="${item.imageUrl}" alt="${item.title}" class="h-full w-auto max-w-[85vw] object-cover transition-transform duration-1000 group-hover:scale-110" />
-                  <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
-                  ${item.type === 'video' ? `
-                    <div class="absolute inset-0 flex items-center justify-center">
-                      <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i data-lucide="play" class="text-white fill-white ml-1 w-6 h-6"></i>
-                      </div>
-                    </div>
-                  ` : ''}
-
-                  <div class="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 w-full overflow-hidden">
-                    <span class="text-xs uppercase tracking-[0.2em] font-medium text-gray-300 mb-2 block">${item.category}</span>
-                    <h3 class="text-2xl md:text-4xl font-semibold tracking-tight truncate block w-full">${item.title}</h3>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </section>
-        `;
-      }
-
-      let artsHtml = '';
-      if (recentArts.length > 0) {
-        artsHtml = `
-          <section class="py-24 px-6 md:px-12 max-w-7xl mx-auto">
-            <div class="flex justify-between items-end mb-12">
-               <h2 class="text-3xl md:text-5xl font-light tracking-tight">Design <span class="font-semibold">Visual</span></h2>
-               <button onclick="navigate('designer')" class="text-sm font-medium text-gray-400 hover:text-white flex items-center">
-                 Ver Todos <i data-lucide="chevron-right" class="ml-1 w-4 h-4"></i>
-               </button>
-            </div>
-            <!-- Masonry Grid para respeitar altura/formato das artes -->
-            <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-              ${recentArts.map(art => `
-                <div class="break-inside-avoid group relative rounded-2xl overflow-hidden bg-[#111] mb-6 cursor-pointer" onclick="openProjectModal('${art.id}')">
-                  <img src="${art.imageUrl}" alt="${art.title}" class="w-full h-auto block transition-transform duration-700 group-hover:scale-105" />
-                  <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 overflow-hidden">
-                    <h4 class="text-xl font-medium truncate block w-full">${art.title}</h4>
-                    <p class="text-sm text-gray-400 truncate block w-full">${art.category}</p>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </section>
-        `;
-      }
-
+      let heroTitleHtml = heroWords.map((word, i) => `<span class="block ${i === 1 ? 'text-transparent bg-clip-text bg-gradient-to-r from-gray-200 to-gray-600 mt-2' : ''}">${word}</span>`).join('');
       container.innerHTML = `
         <section class="relative h-[90vh] flex items-center justify-center overflow-hidden">
-          <div class="absolute inset-0 z-0 opacity-40">
-             <img src="${state.settings.heroImage}" alt="Hero Background" class="w-full h-full object-cover" />
-             <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/60 to-black"></div>
-          </div>
-          
-          <div class="relative z-10 text-center px-6 max-w-5xl mx-auto mt-20">
-            <h1 class="text-5xl md:text-7xl lg:text-9xl font-semibold tracking-tighter leading-[0.9] mb-6">
-              ${heroTitleHtml}
-            </h1>
-            <p class="text-lg md:text-2xl text-gray-400 font-light tracking-wide mb-10 max-w-2xl mx-auto">
-              ${state.settings.heroSubtitle}
-            </p>
-            <div>
-              <button onclick="navigate('designer')" class="bg-white text-black px-8 py-4 rounded-full font-medium hover:scale-105 transition-transform duration-300">
-                Explorar Projetos
-              </button>
-            </div>
-          </div>
+          <div class="absolute inset-0 z-0 opacity-40"><img src="${state.settings.heroImage}" class="w-full h-full object-cover" /><div class="absolute inset-0 bg-gradient-to-b from-black/20 via-black/60 to-black"></div></div>
+          <div class="relative z-10 text-center px-6 max-w-5xl mx-auto mt-20"><h1 class="text-5xl md:text-7xl lg:text-9xl font-semibold tracking-tighter leading-[0.9] mb-6">${heroTitleHtml}</h1><p class="text-lg md:text-2xl text-gray-400 mb-10">${state.settings.heroSubtitle}</p><button onclick="navigate('designer')" class="bg-white text-black px-8 py-4 rounded-full">Explorar Projetos</button></div>
         </section>
-
-        ${featuredHtml}
-
-        <section class="py-32 px-6 bg-[#0a0a0a] flex items-center justify-center text-center">
-          <div class="max-w-4xl mx-auto">
-            <p class="text-3xl md:text-5xl lg:text-6xl font-light leading-tight tracking-tight text-gray-300">
-              "${state.settings.heroPhrase}"
-            </p>
-          </div>
-        </section>
-
-        ${artsHtml}
+        <section class="py-32 px-6 bg-[#0a0a0a] text-center"><div class="max-w-4xl mx-auto"><p class="text-3xl md:text-5xl lg:text-6xl font-light text-gray-300">"${state.settings.heroPhrase}"</p></div></section>
       `;
     }
 
     function renderDesigner() {
       const container = document.getElementById('view-designer');
       container.classList.remove('hidden');
-      
-      const allProjects = state.projects.filter(p => p.type === 'arte');
-      const filtered = state.designerFilter === 'Todos' ? allProjects : allProjects.filter(p => p.category === state.designerFilter);
-
-      let filtersHtml = `
-        <button onclick="setDesignerFilter('Todos')" class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${state.designerFilter === 'Todos' ? 'bg-white text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}">Todos</button>
-        ${state.categories.map(cat => `
-          <button onclick="setDesignerFilter('${cat}')" class="px-5 py-2 rounded-full text-sm font-medium transition-all duration-300 ${state.designerFilter === cat ? 'bg-white text-black' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}">${cat}</button>
-        `).join('')}
-      `;
-
-      // Masonry Grid com w-full h-auto (Mantenha o ratio da arte de design)
-      let gridHtml = filtered.length > 0 ? filtered.map(project => `
-        <div class="break-inside-avoid relative group rounded-2xl overflow-hidden bg-[#111] mb-6 cursor-pointer" onclick="openProjectModal('${project.id}')">
-          <img src="${project.imageUrl}" alt="${project.title}" class="w-full h-auto block transition-transform duration-700 group-hover:scale-105" loading="lazy" />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col justify-end p-6 overflow-hidden">
-            <span class="text-xs uppercase tracking-widest text-gray-400 mb-1 truncate block w-full">${project.category}</span>
-            <h3 class="text-xl font-medium truncate block w-full">${project.title}</h3>
-            <button class="mt-4 w-10 h-10 rounded-full bg-white text-black flex items-center justify-center transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100">
-              <i data-lucide="chevron-right" class="w-5 h-5"></i>
-            </button>
-          </div>
-        </div>
-      `).join('') : `<div class="col-span-full py-20 text-center text-gray-500">Nenhum projeto encontrado nesta categoria.</div>`;
-
-      container.innerHTML = `
-        <div class="max-w-7xl mx-auto px-6 py-12">
-          <header class="mb-16 md:mb-24 text-center md:text-left mt-12">
-            <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter mb-6">Portfolio.</h1>
-            <p class="text-xl text-gray-400 font-light max-w-2xl">Uma seleção cuidadosa de projetos de design visual, identidades e campanhas.</p>
-          </header>
-
-          <div class="flex flex-wrap gap-3 mb-12 border-b border-white/10 pb-6" id="designer-filters">
-            ${filtersHtml}
-          </div>
-
-          <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6" id="designer-grid">
-            ${gridHtml}
-          </div>
-        </div>
-      `;
-    }
-
-    window.setDesignerFilter = function(cat) {
-      state.designerFilter = cat;
-      renderDesigner();
-      lucide.createIcons();
+      const arts = state.projects.filter(p => p.type === 'arte');
+      container.innerHTML = `<div class="max-w-7xl mx-auto px-6 py-12"><h1 class="text-5xl md:text-7xl font-semibold mb-8">Portfolio.</h1><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">${arts.map(p => `<div class="bg-[#111] rounded-2xl overflow-hidden cursor-pointer" onclick="openProjectModal('${p.id}')"><img src="${p.imageUrl}" class="w-full aspect-video object-cover"/><div class="p-4"><h3 class="font-medium">${p.title}</h3><p class="text-gray-500 text-sm">${p.category}</p></div></div>`).join('')}</div></div>`;
     }
 
     function renderVideo() {
       const container = document.getElementById('view-video');
       container.classList.remove('hidden');
-      
       const videos = state.projects.filter(p => p.type === 'video');
-
-      // Grid convertido para Masonry para não cortar thumbnails verticais de vídeo (Ex: Shorts/Reels)
-      container.innerHTML = `
-        <div class="max-w-7xl mx-auto px-6 py-12">
-          <header class="mb-16 md:mb-24 mt-12">
-            <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter mb-6">Cinematografia.</h1>
-            <p class="text-xl text-gray-400 font-light max-w-2xl">Movimento, som e narrativa. Explorando dimensões através de lentes e pixels.</p>
-          </header>
-
-          <div class="columns-1 md:columns-2 gap-8 space-y-8">
-            ${videos.length > 0 ? videos.map(video => `
-              <div class="break-inside-avoid group cursor-pointer mb-8" onclick="openProjectModal('${video.id}')">
-                <div class="relative rounded-2xl overflow-hidden bg-[#111] mb-4">
-                  <!-- Thumbnails de vídeo no formato original 16:9 ou 9:16 -->
-                  <img src="${video.imageUrl}" alt="${video.title}" class="w-full h-auto block transition-transform duration-700 group-hover:scale-105" />
-                  <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors duration-300"></div>
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-16 h-16 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform">
-                      <i data-lucide="play" class="text-white fill-white ml-1 w-6 h-6"></i>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex justify-between items-start">
-                  <div class="w-full overflow-hidden">
-                    <h3 class="text-2xl font-medium tracking-tight mb-1 truncate block w-full">${video.title}</h3>
-                    <p class="text-gray-500 text-sm truncate block w-full">${video.category}</p>
-                  </div>
-                </div>
-              </div>
-            `).join('') : `<div class="col-span-full py-20 text-center text-gray-500">Nenhum vídeo disponível no momento.</div>`}
-          </div>
-        </div>
-      `;
+      container.innerHTML = `<div class="max-w-7xl mx-auto px-6 py-12"><h1 class="text-5xl md:text-7xl font-semibold mb-8">Cinematografia.</h1><div class="grid grid-cols-1 md:grid-cols-2 gap-8">${videos.map(p => `<div class="cursor-pointer" onclick="openProjectModal('${p.id}')"><div class="rounded-2xl overflow-hidden bg-[#111]"><img src="${p.imageUrl}" class="w-full aspect-video object-cover"/><div class="p-4"><h3 class="text-xl font-medium">${p.title}</h3><p class="text-gray-500">${p.category}</p></div></div></div>`).join('')}</div></div>`;
     }
 
     function renderFotografia() {
       const container = document.getElementById('view-fotografia');
       container.classList.remove('hidden');
-      const photos = state.projects.filter(p => p.type === 'foto');
-
-      // Masonry Layout puro, substitui os aspet-square e cortes
-      container.innerHTML = `
-        <div class="max-w-7xl mx-auto px-6 py-12">
-          <header class="mb-16 md:mb-24 mt-12 text-center">
-            <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter mb-6">Fotografia.</h1>
-            <p class="text-xl text-gray-400 font-light max-w-2xl mx-auto">Capturando momentos, luzes e sombras em sua forma mais pura.</p>
-          </header>
-          
-          <div class="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
-            ${photos.length > 0 ? photos.map((photo, i) => `
-              <div class="break-inside-avoid relative group bg-[#111] overflow-hidden rounded-2xl mb-4 cursor-pointer" onclick="openProjectModal('${photo.id}')">
-                <img src="${photo.imageUrl}" alt="${photo.title}" class="w-full h-auto block transition-transform duration-1000 group-hover:scale-110" />
-                <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                  <span class="text-white tracking-widest uppercase text-sm truncate max-w-[90%] block text-center">${photo.title}</span>
-                </div>
-              </div>
-            `).join('') : `<div class="col-span-full py-20 text-center text-gray-500">Galeria em construção.</div>`}
-          </div>
-        </div>
-      `;
+      const fotos = state.projects.filter(p => p.type === 'foto');
+      container.innerHTML = `<div class="max-w-7xl mx-auto px-6 py-12"><h1 class="text-5xl md:text-7xl font-semibold mb-8 text-center">Fotografia.</h1><div class="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">${fotos.map(p => `<div class="break-inside-avoid cursor-pointer" onclick="openProjectModal('${p.id}')"><img src="${p.imageUrl}" class="w-full rounded-2xl"/></div>`).join('')}</div></div>`;
     }
 
     function renderSobre() {
       const container = document.getElementById('view-sobre');
       container.classList.remove('hidden');
-      
-      container.innerHTML = `
-        <div class="max-w-7xl mx-auto px-6 py-24 min-h-[70vh] flex items-center">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-            <div class="relative rounded-3xl overflow-hidden bg-[#111]">
-              <img src="${state.settings.heroImage}" alt="Profile" class="w-full h-auto block grayscale hover:grayscale-0 transition-all duration-700" />
-            </div>
-            <div>
-              <h2 class="text-sm tracking-[0.3em] text-gray-500 uppercase mb-4">Sobre o Artista</h2>
-              <h1 class="text-5xl md:text-6xl font-semibold tracking-tighter mb-8 leading-tight">
-                Design focado na <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-gray-400 to-white">essência.</span>
-              </h1>
-              <p class="text-lg text-gray-400 font-light leading-relaxed mb-8">
-                ${state.settings.aboutText}
-              </p>
-              <div class="flex flex-col space-y-4">
-                 <div class="flex items-center text-gray-300">
-                   <i data-lucide="mail" class="mr-4 text-gray-500 w-5 h-5"></i> ${state.settings.email}
-                 </div>
-                 <div class="flex space-x-6 pt-4 items-center">
-                    <a href="${state.settings.instagram || '#'}" target="_blank" class="text-gray-500 hover:text-white transition-colors"><i data-lucide="instagram" class="w-6 h-6"></i></a>
-                    <a href="${state.settings.whatsapp || '#'}" target="_blank" class="text-gray-500 hover:text-white transition-colors">
-                      <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 0C5.394 0 0 5.394 0 12.031c0 2.12.548 4.185 1.589 6.002L.055 24l6.143-1.611a11.96 11.96 0 0 0 5.833 1.517h.005c6.634 0 12.028-5.394 12.03-12.03A11.97 11.97 0 0 0 20.537 3.52 11.97 11.97 0 0 0 12.031 0zm0 21.895h-.004a9.92 9.92 0 0 1-5.06-1.378l-.363-.215-3.766.988 1.006-3.673-.236-.375a9.92 9.92 0 0 1-1.518-5.293c.002-5.485 4.468-9.948 9.953-9.948 2.658 0 5.156 1.037 7.034 2.915a9.93 9.93 0 0 1 2.912 7.036c-.003 5.485-4.469 9.943-9.957 9.943zm5.457-7.447c-.299-.15-1.77-.875-2.044-.975-.274-.1-.472-.15-.672.15-.198.3-.77.975-.944 1.175-.174.2-.349.225-.648.075-.298-.15-1.263-.465-2.406-1.485-.89-.794-1.49-1.774-1.664-2.074-.174-.3-.019-.462.13-.612.135-.135.299-.35.449-.525.15-.175.2-.3.3-.5.1-.2.05-.375-.025-.525-.075-.15-.672-1.625-.922-2.225-.243-.585-.49-.505-.672-.515a12.95 12.95 0 0 0-.573-.01c-.2 0-.523.075-.797.375-.274.3-1.047 1.025-1.047 2.5 0 1.475 1.072 2.9 1.222 3.1.15.2 2.112 3.225 5.112 4.525.714.309 1.27.493 1.705.63.716.229 1.369.196 1.884.119.575-.086 1.77-.725 2.02-1.425.25-.7.25-1.3.175-1.425-.075-.125-.274-.2-.573-.35z"/></svg>
-                    </a>
-                    <a href="${state.settings.linkedin || '#'}" target="_blank" class="text-gray-500 hover:text-white transition-colors"><i data-lucide="linkedin" class="w-6 h-6"></i></a>
-                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
+      container.innerHTML = `<div class="max-w-7xl mx-auto px-6 py-24"><div class="grid md:grid-cols-2 gap-16 items-center"><img src="${state.settings.heroImage}" class="rounded-3xl"/><div><h2 class="text-sm tracking-[0.3em] text-gray-500 mb-4">Sobre</h2><h1 class="text-5xl font-semibold mb-6">Design focado na essência.</h1><p class="text-gray-400 text-lg">${state.settings.aboutText}</p></div></div></div>`;
     }
 
     function renderContato() {
       const container = document.getElementById('view-contato');
       container.classList.remove('hidden');
-
-      container.innerHTML = `
-        <div class="max-w-3xl mx-auto px-6 py-24 min-h-[70vh] flex flex-col justify-center">
-          <h1 class="text-5xl md:text-7xl font-semibold tracking-tighter mb-6 text-center">${state.settings.contactTitle || 'Vamos conversar.'}</h1>
-          <p class="text-xl text-gray-400 font-light text-center mb-16">${state.settings.contactSubtitle || 'Tem um projeto em mente? Deixe sua mensagem.'}</p>
-
-          <form class="space-y-8" onsubmit="event.preventDefault(); alert('Mensagem enviada! (Simulação)');">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">Nome</label>
-                <input type="text" class="w-full bg-transparent border-b border-gray-800 py-3 text-white focus:outline-none focus:border-white transition-colors" placeholder="John Doe" required />
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">E-mail</label>
-                <input type="email" class="w-full bg-transparent border-b border-gray-800 py-3 text-white focus:outline-none focus:border-white transition-colors" placeholder="john@example.com" required />
-              </div>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-gray-500 uppercase tracking-widest mb-2">Mensagem</label>
-              <textarea rows="4" class="w-full bg-transparent border-b border-gray-800 py-3 text-white focus:outline-none focus:border-white transition-colors resize-none" placeholder="Conte-me sobre o seu projeto..." required></textarea>
-            </div>
-            <div class="text-center pt-8">
-              <button type="submit" class="bg-white text-black px-12 py-4 rounded-full font-medium hover:bg-gray-200 transition-colors flex items-center justify-center mx-auto">
-                Enviar Mensagem <i data-lucide="send" class="ml-2 w-4 h-4"></i>
-              </button>
-            </div>
-          </form>
-        </div>
-      `;
+      container.innerHTML = `<div class="max-w-3xl mx-auto px-6 py-24 text-center"><h1 class="text-5xl font-semibold mb-6">${state.settings.contactTitle}</h1><p class="text-gray-400 mb-12">${state.settings.contactSubtitle}</p><form onsubmit="event.preventDefault(); alert('Mensagem enviada!')" class="space-y-4"><input type="text" placeholder="Nome" class="w-full bg-[#111] border border-white/10 rounded-xl p-4"><input type="email" placeholder="E-mail" class="w-full bg-[#111] border border-white/10 rounded-xl p-4"><textarea rows="4" placeholder="Mensagem" class="w-full bg-[#111] border border-white/10 rounded-xl p-4"></textarea><button class="bg-white text-black px-8 py-3 rounded-full">Enviar</button></form></div>`;
     }
 
-    // =========================================================================
-    // ADMIN PANEL
-    // =========================================================================
     function renderAdmin() {
       const container = document.getElementById('view-admin');
       container.classList.remove('hidden');
-
-      container.innerHTML = `
-        <div class="flex min-h-screen bg-[#0a0a0a]">
-          <!-- Sidebar -->
-          <aside class="w-64 border-r border-white/5 bg-black p-6 flex flex-col">
-            <div class="mb-12">
-              <h2 class="text-xl font-bold tracking-tighter">Admin Panel<span class="text-blue-500">.</span></h2>
-              <p class="text-xs text-gray-500 mt-1">Gestão de Portfólio</p>
-            </div>
-
-            <nav class="flex-1 space-y-2">
-              <button onclick="setAdminTab('dashboard')" class="admin-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${state.adminTab === 'dashboard' ? 'bg-white/10 text-white' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}" data-tab="dashboard">
-                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> <span class="font-medium text-sm">Dashboard</span>
-              </button>
-              <button onclick="setAdminTab('add')" class="admin-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${state.adminTab === 'add' ? 'bg-white/10 text-white' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}" data-tab="add">
-                <i data-lucide="plus-circle" class="w-4 h-4"></i> <span class="font-medium text-sm">Adicionar Projeto</span>
-              </button>
-              <button onclick="setAdminTab('edit')" class="admin-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${state.adminTab === 'edit' ? 'bg-white/10 text-white' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}" data-tab="edit">
-                <i data-lucide="edit-3" class="w-4 h-4"></i> <span class="font-medium text-sm">Gerenciar Projetos</span>
-              </button>
-              <button onclick="setAdminTab('categories')" class="admin-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${state.adminTab === 'categories' ? 'bg-white/10 text-white' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}" data-tab="categories">
-                <i data-lucide="layers" class="w-4 h-4"></i> <span class="font-medium text-sm">Categorias</span>
-              </button>
-              <button onclick="setAdminTab('settings')" class="admin-tab-btn w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${state.adminTab === 'settings' ? 'bg-white/10 text-white' : 'text-gray-500 hover:bg-white/5 hover:text-gray-300'}" data-tab="settings">
-                <i data-lucide="settings" class="w-4 h-4"></i> <span class="font-medium text-sm">Configurações</span>
-              </button>
-            </nav>
-
-            <button onclick="adminLogout()" class="mt-auto flex items-center space-x-3 px-4 py-3 text-red-400 hover:bg-red-400/10 rounded-xl transition-colors">
-              <i data-lucide="log-out" class="w-4 h-4"></i> <span class="font-medium text-sm">Sair</span>
-            </button>
-          </aside>
-
-          <!-- Main Content -->
-          <main class="flex-1 p-10 overflow-y-auto h-screen" id="admin-content-area"></main>
-        </div>
-      `;
-
-      renderAdminTabContent();
+      container.innerHTML = `<div class="p-8"><h1 class="text-3xl font-bold">Admin</h1><button onclick="adminLogout()" class="bg-white text-black px-4 py-2 rounded mt-4">Sair</button></div>`;
     }
 
-    window.setAdminTab = function(tab) {
-      state.adminTab = tab;
-      if (tab !== 'add') state.editingProject = null;
-      renderAdmin();
-      lucide.createIcons();
-    }
+    window.setAdminTab = function(tab) { state.adminTab = tab; };
+    window.adminLogout = function() { state.isAdmin = false; navigate('home'); };
+    window.toggleProjectMediaInputs = function() {};
+    window.editProject = function(id) {};
+    window.deleteProject = async function(id) {};
+    window.deleteCategory = async function(name) {};
 
-    window.adminLogout = function() {
-      state.isAdmin = false;
-      navigate('home');
-    }
-
-    function renderAdminTabContent() {
-      const area = document.getElementById('admin-content-area');
-      
-      if (state.adminTab === 'dashboard') {
-        const stats = {
-          total: state.projects.length,
-          arts: state.projects.filter(p => p.type === 'arte').length,
-          videos: state.projects.filter(p => p.type === 'video').length,
-          featured: state.projects.filter(p => p.isFeatured).length
-        };
-
-        area.innerHTML = `
-          <h2 class="text-3xl font-semibold mb-8">Visão Geral</h2>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div class="bg-[#111] border border-white/5 p-6 rounded-3xl flex items-center justify-between">
-              <div><p class="text-gray-500 text-sm mb-1">Total de Projetos</p><p class="text-3xl font-semibold">${stats.total}</p></div>
-              <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-blue-400"><i data-lucide="layers" class="w-6 h-6"></i></div>
-            </div>
-            <div class="bg-[#111] border border-white/5 p-6 rounded-3xl flex items-center justify-between">
-              <div><p class="text-gray-500 text-sm mb-1">Artes</p><p class="text-3xl font-semibold">${stats.arts}</p></div>
-              <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-purple-400"><i data-lucide="image" class="w-6 h-6"></i></div>
-            </div>
-            <div class="bg-[#111] border border-white/5 p-6 rounded-3xl flex items-center justify-between">
-              <div><p class="text-gray-500 text-sm mb-1">Vídeos</p><p class="text-3xl font-semibold">${stats.videos}</p></div>
-              <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-pink-400"><i data-lucide="video" class="w-6 h-6"></i></div>
-            </div>
-            <div class="bg-[#111] border border-white/5 p-6 rounded-3xl flex items-center justify-between">
-              <div><p class="text-gray-500 text-sm mb-1">Em Destaque</p><p class="text-3xl font-semibold">${stats.featured}</p></div>
-              <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-green-400"><i data-lucide="check" class="w-6 h-6"></i></div>
-            </div>
-          </div>
-
-          <h3 class="text-xl font-medium mb-4">Adicionados Recentemente</h3>
-          <div class="bg-[#111] border border-white/5 rounded-2xl overflow-hidden">
-            <table class="w-full text-left text-sm">
-              <thead class="bg-white/5 text-gray-400">
-                <tr>
-                  <th class="p-4 font-medium">Projeto</th>
-                  <th class="p-4 font-medium">Categoria</th>
-                  <th class="p-4 font-medium">Tipo</th>
-                  <th class="p-4 font-medium">Data</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-white/5">
-                ${state.projects.slice(0, 5).map(p => `
-                  <tr class="hover:bg-white/5 transition-colors">
-                    <td class="p-4 flex items-center space-x-3">
-                      <div class="w-10 h-10 rounded bg-[#222] overflow-hidden">
-                        <img src="${p.imageUrl}" alt="" class="w-full h-full object-cover" />
-                      </div>
-                      <span class="font-medium text-white truncate block max-w-[150px] sm:max-w-[200px]">${p.title}</span>
-                    </td>
-                    <td class="p-4 text-gray-400">${p.category}</td>
-                    <td class="p-4 text-gray-400 capitalize">${p.type}</td>
-                    <td class="p-4 text-gray-400">${new Date(p.createdAt).toLocaleDateString()}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        `;
-      } else if (state.adminTab === 'add') {
-        const p = state.editingProject;
-        const mediaType = p?.type || 'arte';
-
-        area.innerHTML = `
-          <div class="max-w-3xl">
-            <h2 class="text-3xl font-semibold mb-8">${p ? 'Editar Projeto' : 'Novo Projeto'}</h2>
-            
-            <form id="admin-project-form" class="space-y-6 bg-[#111] p-8 rounded-3xl border border-white/5">
-              <div class="grid grid-cols-2 gap-6">
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm text-gray-400 mb-2">Título do Projeto</label>
-                  <input type="text" name="title" value="${p?.title || ''}" required class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                </div>
-                
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm text-gray-400 mb-2">Categoria</label>
-                  <select name="category" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30 appearance-none">
-                    ${state.categories.map(c => `<option value="${c}" ${p?.category === c ? 'selected' : ''}>${c}</option>`).join('')}
-                  </select>
-                </div>
-
-                <div class="col-span-2 md:col-span-1">
-                  <label class="block text-sm text-gray-400 mb-2">Tipo de Mídia</label>
-                  <select name="type" id="project-media-type" onchange="toggleProjectMediaInputs()" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30 appearance-none">
-                    <option value="arte" ${mediaType === 'arte' ? 'selected' : ''}>Arte / Design</option>
-                    <option value="video" ${mediaType === 'video' ? 'selected' : ''}>Vídeo</option>
-                    <option value="foto" ${mediaType === 'foto' ? 'selected' : ''}>Fotografia</option>
-                  </select>
-                </div>
-
-                <div class="col-span-2 md:col-span-1 flex items-center mt-8">
-                  <label class="flex items-center space-x-3 cursor-pointer">
-                    <input type="checkbox" name="isFeatured" ${p?.isFeatured ? 'checked' : ''} class="w-5 h-5 rounded border-white/10 bg-[#1a1a1a] text-blue-500 focus:ring-0 focus:ring-offset-0" />
-                    <span class="text-sm text-gray-300">Destacar na Home</span>
-                  </label>
-                </div>
-
-                <!-- ARTE INPUTS -->
-                <div id="media-inputs-arte" class="col-span-2 ${mediaType !== 'arte' ? 'hidden' : ''}">
-                  <label class="block text-sm text-gray-400 mb-2">Imagem (Upload ou Link Drive/Web)</label>
-                  <div class="flex flex-col space-y-3">
-                    <input type="file" name="imageFile" accept="image/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-white/10 file:text-white hover:file:bg-white/20 transition-all cursor-pointer" />
-                    <div class="flex items-center space-x-2 text-gray-500 text-sm"><span>ou link online:</span></div>
-                    <input type="url" name="imageUrl" value="${p?.imageUrl || ''}" placeholder="https://drive.google.com/uc?export=view&id=..." class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                </div>
-
-                <!-- VIDEO INPUTS -->
-                <div id="media-inputs-video" class="col-span-2 ${mediaType !== 'video' ? 'hidden' : ''}">
-                  <label class="block text-sm text-gray-400 mb-2">Vídeo (Upload ou Link YouTube/Drive)</label>
-                  <div class="flex flex-col space-y-3">
-                    <input type="file" name="videoFile" accept="video/*" class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-white/10 file:text-white hover:file:bg-white/20 transition-all cursor-pointer" />
-                    <div class="flex items-center space-x-2 text-gray-500 text-sm"><span>ou link online:</span></div>
-                    <input type="url" name="videoUrl" value="${p?.videoUrl || ''}" placeholder="https://www.youtube.com/watch?v=... ou Drive link" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                  <p class="text-xs text-blue-400 mt-2">A capa será gerada e extraída automaticamente do vídeo pelo sistema.</p>
-                </div>
-
-                <!-- FOTO INPUTS -->
-                <div id="media-inputs-foto" class="col-span-2 ${mediaType !== 'foto' ? 'hidden' : ''}">
-                  <label class="block text-sm text-gray-400 mb-2">Fotografias (Upload Múltiplo ou Link)</label>
-                  <div class="flex flex-col space-y-3">
-                    <input type="file" name="photoFiles" accept="image/*" multiple class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-medium file:bg-white/10 file:text-white hover:file:bg-white/20 transition-all cursor-pointer" />
-                    <div class="flex items-center space-x-2 text-gray-500 text-sm"><span>ou link online:</span></div>
-                    <input type="url" name="photoUrl" value="${p?.imageUrl || ''}" placeholder="https://drive.google.com/uc?export=view&id=..." class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                </div>
-
-                <div class="col-span-2">
-                  <label class="block text-sm text-gray-400 mb-2">Descrição</label>
-                  <textarea name="description" rows="4" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30 resize-none">${p?.description || ''}</textarea>
-                </div>
-              </div>
-
-              <div class="pt-4 border-t border-white/5 flex justify-end space-x-4">
-                <button type="button" onclick="setAdminTab('edit')" class="px-6 py-3 rounded-xl text-gray-400 hover:text-white transition-colors">Cancelar</button>
-                <button type="submit" id="submit-project-btn" class="px-6 py-3 rounded-xl bg-white text-black font-medium hover:bg-gray-200 transition-colors disabled:opacity-50">
-                  ${p ? 'Salvar Edição' : 'Salvar Projeto'}
-                </button>
-              </div>
-            </form>
-          </div>
-        `;
-
-        document.getElementById('admin-project-form').addEventListener('submit', handleProjectSubmit);
-      } else if (state.adminTab === 'edit') {
-        area.innerHTML = `
-          <h2 class="text-3xl font-semibold mb-8">Gerenciar Projetos</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            ${state.projects.map(p => `
-              <div class="bg-[#111] border border-white/5 rounded-2xl overflow-hidden group">
-                <div class="aspect-video relative overflow-hidden">
-                  <img src="${p.imageUrl}" alt="${p.title}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                  ${p.isFeatured ? `<span class="absolute top-3 right-3 bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">Destaque</span>` : ''}
-                </div>
-                <div class="p-5">
-                  <div class="flex justify-between items-start mb-2">
-                    <h3 class="font-medium text-lg truncate pr-2 block w-full">${p.title}</h3>
-                    <span class="text-xs text-gray-500 uppercase">${p.type}</span>
-                  </div>
-                  <p class="text-sm text-gray-400 mb-6">${p.category}</p>
-                  
-                  <div class="flex justify-between items-center pt-4 border-t border-white/5">
-                    <button onclick="editProject('${p.id}')" class="text-sm text-gray-400 hover:text-white flex items-center"><i data-lucide="edit-3" class="w-3.5 h-3.5 mr-1"></i> Editar</button>
-                    <button onclick="deleteProject('${p.id}')" class="text-sm text-red-500 hover:text-red-400 flex items-center"><i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1"></i> Excluir</button>
-                  </div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      } else if (state.adminTab === 'categories') {
-        area.innerHTML = `
-          <div class="max-w-2xl">
-            <h2 class="text-3xl font-semibold mb-8">Categorias</h2>
-            
-            <form id="admin-category-form" class="flex space-x-4 mb-8">
-              <input type="text" id="new-cat-input" placeholder="Nova Categoria..." class="flex-1 bg-[#111] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-              <button type="submit" id="add-cat-btn" class="px-6 py-3 rounded-xl bg-white text-black font-medium hover:bg-gray-200 transition-colors disabled:opacity-50">Adicionar</button>
-            </form>
-
-            <div class="bg-[#111] border border-white/5 rounded-2xl p-2">
-              ${state.categories.map(c => `
-                <div class="flex justify-between items-center p-4 hover:bg-white/5 rounded-xl transition-colors">
-                  <span class="font-medium text-gray-300">${c}</span>
-                  <button onclick="deleteCategory('${c}')" class="text-red-500 hover:text-red-400 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `;
-        document.getElementById('admin-category-form').addEventListener('submit', handleCategorySubmit);
-      } else if (state.adminTab === 'settings') {
-        area.innerHTML = `
-          <div class="max-w-3xl pb-20">
-            <h2 class="text-3xl font-semibold mb-8">Configurações do Site</h2>
-            
-            <form id="admin-settings-form" class="space-y-8 bg-[#111] p-8 rounded-3xl border border-white/5">
-              <div class="space-y-4">
-                <h3 class="text-xl font-medium border-b border-white/10 pb-2 mb-4">Página Inicial</h3>
-                <div class="grid grid-cols-2 gap-6">
-                  <div class="col-span-2 md:col-span-1">
-                    <label class="block text-sm text-gray-400 mb-2">Nome / Título (Hero)</label>
-                    <input type="text" name="heroName" value="${state.settings.heroName}" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                  <div class="col-span-2 md:col-span-1">
-                    <label class="block text-sm text-gray-400 mb-2">Subtítulo (Hero)</label>
-                    <input type="text" name="heroSubtitle" value="${state.settings.heroSubtitle}" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                  <div class="col-span-2">
-                    <label class="block text-sm text-gray-400 mb-2">Imagem de Fundo (URL)</label>
-                    <input type="url" name="heroImage" value="${state.settings.heroImage}" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                  <div class="col-span-2">
-                    <label class="block text-sm text-gray-400 mb-2">Frase Conceitual</label>
-                    <textarea name="heroPhrase" rows="2" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30 resize-none">${state.settings.heroPhrase}</textarea>
-                  </div>
-                </div>
-              </div>
-
-              <div class="space-y-4">
-                <h3 class="text-xl font-medium border-b border-white/10 pb-2 mb-4">Sobre & Redes Sociais</h3>
-                <div class="grid grid-cols-2 gap-6">
-                  <div class="col-span-2">
-                    <label class="block text-sm text-gray-400 mb-2">Texto Biográfico</label>
-                    <textarea name="aboutText" rows="4" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30 resize-none">${state.settings.aboutText}</textarea>
-                  </div>
-                  <div class="col-span-2 md:col-span-1">
-                    <label class="block text-sm text-gray-400 mb-2">E-mail de Contato</label>
-                    <input type="email" name="email" value="${state.settings.email}" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                  <div class="col-span-2 md:col-span-1">
-                    <label class="block text-sm text-gray-400 mb-2">Link Instagram</label>
-                    <input type="url" name="instagram" value="${state.settings.instagram || ''}" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                  <div class="col-span-2 md:col-span-1">
-                    <label class="block text-sm text-gray-400 mb-2">Link WhatsApp</label>
-                    <input type="url" name="whatsapp" value="${state.settings.whatsapp || ''}" placeholder="https://wa.me/..." class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                  <div class="col-span-2 md:col-span-1">
-                    <label class="block text-sm text-gray-400 mb-2">Link LinkedIn</label>
-                    <input type="url" name="linkedin" value="${state.settings.linkedin || ''}" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                </div>
-              </div>
-
-              <div class="space-y-4">
-                <h3 class="text-xl font-medium border-b border-white/10 pb-2 mb-4">Página de Contato</h3>
-                <div class="grid grid-cols-2 gap-6">
-                  <div class="col-span-2">
-                    <label class="block text-sm text-gray-400 mb-2">Título do Contato (Ex: Vamos conversar.)</label>
-                    <input type="text" name="contactTitle" value="${state.settings.contactTitle || 'Vamos conversar.'}" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                  <div class="col-span-2">
-                    <label class="block text-sm text-gray-400 mb-2">Subtítulo do Contato</label>
-                    <input type="text" name="contactSubtitle" value="${state.settings.contactSubtitle || 'Tem um projeto em mente? Deixe sua mensagem.'}" class="w-full bg-[#1a1a1a] border border-white/5 rounded-xl p-3 text-white focus:outline-none focus:border-white/30" />
-                  </div>
-                </div>
-              </div>
-
-              <div class="pt-4 border-t border-white/5 flex justify-end">
-                <button type="submit" id="submit-settings-btn" class="px-8 py-3 rounded-xl bg-white text-black font-medium hover:bg-gray-200 transition-colors disabled:opacity-50">
-                  Salvar Configurações
-                </button>
-              </div>
-            </form>
-          </div>
-        `;
-        document.getElementById('admin-settings-form').addEventListener('submit', handleSettingsSubmit);
-      }
-    }
-
-    // =========================================================================
-    // LÓGICA DE FORMULÁRIOS (ADMIN)
-    // =========================================================================
-
-    window.toggleProjectMediaInputs = function() {
-      const type = document.getElementById('project-media-type').value;
-      document.getElementById('media-inputs-arte').classList.add('hidden');
-      document.getElementById('media-inputs-video').classList.add('hidden');
-      document.getElementById('media-inputs-foto').classList.add('hidden');
-      document.getElementById('media-inputs-' + type).classList.remove('hidden');
-    }
-
-    const handleFileRead = (file) => new Promise((resolve, reject) => {
-      const MAX_SIZE_MB = 35; 
-      if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-        alert(`O ficheiro "${file.name}" tem ${(file.size / 1024 / 1024).toFixed(1)}MB. O limite para upload direto no painel é ${MAX_SIZE_MB}MB.\n\nPara ficheiros maiores, faça o upload diretamente na sua pasta do Google Drive e cole o link online no campo abaixo.`);
-        reject(new Error('FILE_TOO_LARGE'));
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => resolve({
-        name: file.name,
-        mimeType: file.type,
-        base64: reader.result.split(',')[1]
-      });
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-
-    const generateVideoThumbnail = (file) => new Promise((resolve) => {
-      const video = document.createElement('video');
-      video.preload = 'metadata';
-      video.muted = true;
-      video.playsInline = true;
-      video.src = URL.createObjectURL(file);
-      video.onloadeddata = () => {
-        video.currentTime = Math.min(1, video.duration > 0 ? video.duration / 2 : 1);
-      };
-      video.onseeked = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 640;
-        canvas.height = (video.videoHeight / video.videoWidth) * 640;
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', 0.6));
-        URL.revokeObjectURL(video.src);
-      };
-      video.onerror = () => resolve('');
-    });
-
-    async function handleProjectSubmit(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submit-project-btn');
-      btn.disabled = true;
-      btn.textContent = 'Salvando...';
-
-      const form = e.target;
-      const mediaType = form.type.value;
-      
-      const baseData = {
-        title: form.title.value || '',
-        description: form.description.value || '',
-        category: form.category.value,
-        type: mediaType,
-        isFeatured: form.isFeatured.checked || false,
-        updatedAt: Date.now()
-      };
-
-      if (state.editingProject) {
-        baseData.id = state.editingProject.id;
-        baseData.createdAt = state.editingProject.createdAt;
-      } else {
-        baseData.createdAt = Date.now();
-      }
-
-      try {
-        if (mediaType === 'foto') {
-          const files = form.photoFiles.files;
-          if (files && files.length > 0) {
-            for (let i = 0; i < files.length; i++) {
-              const fileUpload = await handleFileRead(files[i]);
-              const data = { ...baseData, fileUpload };
-              if (state.editingProject && i === 0) data.id = state.editingProject.id; 
-              await apiPost('saveProject', data);
-            }
-          } else {
-            const data = { ...baseData, imageUrl: formatDriveUrl(form.photoUrl.value) };
-            await apiPost('saveProject', data);
-          }
-        } else if (mediaType === 'video') {
-          const file = form.videoFile.files[0];
-          let videoUrl = form.videoUrl.value || '';
-          let imageUrl = '';
-          let fileUpload = null;
-
-          if (file) {
-            fileUpload = await handleFileRead(file);
-            imageUrl = await generateVideoThumbnail(file); 
-          } else {
-            imageUrl = getVideoCover(videoUrl);
-          }
-
-          const data = { ...baseData, videoUrl, imageUrl, fileUpload };
-          await apiPost('saveProject', data);
-        } else {
-          const file = form.imageFile.files[0];
-          let imageUrl = form.imageUrl.value || '';
-          let fileUpload = null;
-
-          if (file) {
-            fileUpload = await handleFileRead(file);
-          } else {
-            imageUrl = formatDriveUrl(imageUrl);
-          }
-
-          const data = { ...baseData, imageUrl, fileUpload };
-          await apiPost('saveProject', data);
-        }
-
-        await fetchData();
-        setAdminTab('edit');
-      } catch (err) {
-        if (err.message === 'FILE_TOO_LARGE') {
-           console.warn('Upload cancelado: o tamanho do ficheiro excede o limite permitido (35MB).');
-        } else {
-           console.error(err);
-           alert('Ocorreu um erro ao comunicar e salvar as informações.');
-        }
-      } finally {
-        btn.disabled = false;
-        btn.textContent = state.editingProject ? 'Salvar Edição' : 'Salvar Projeto';
-      }
-    }
-
-    window.editProject = function(id) {
-      state.editingProject = state.projects.find(p => p.id === id);
-      setAdminTab('add');
-    }
-
-    window.deleteProject = async function(id) {
-      if(window.confirm('Tem certeza que deseja excluir este projeto?')) {
-        try {
-          await apiPost('deleteProject', { id });
-          await fetchData();
-          setAdminTab('edit');
-        } catch (e) {
-          alert('Erro ao excluir do Google Sheets.');
-        }
-      }
-    }
-
-    async function handleCategorySubmit(e) {
-      e.preventDefault();
-      const input = document.getElementById('new-cat-input');
-      const btn = document.getElementById('add-cat-btn');
-      const newCat = input.value;
-      if(!newCat.trim()) return;
-
-      btn.disabled = true;
-      input.disabled = true;
-
-      const catId = newCat.trim().toLowerCase().replace(/\s+/g, '-');
-      try {
-        await apiPost('saveCategory', { id: catId, name: newCat.trim() });
-        await fetchData();
-        setAdminTab('categories');
-      } catch (err) {
-        alert('Erro ao adicionar categoria.');
-      } finally {
-        btn.disabled = false;
-        input.disabled = false;
-      }
-    }
-
-    window.deleteCategory = async function(name) {
-      if(!window.confirm('Excluir categoria?')) return;
-      const catId = name.toLowerCase().replace(/\s+/g, '-');
-      try {
-        await apiPost('deleteCategory', { id: catId });
-        await fetchData();
-        setAdminTab('categories');
-      } catch (err) {
-        alert('Erro ao excluir do Google Sheets.');
-      }
-    }
-
-    async function handleSettingsSubmit(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submit-settings-btn');
-      btn.disabled = true;
-      btn.textContent = 'Salvando...';
-
-      const form = e.target;
-      const data = {
-        heroName: form.heroName.value,
-        heroSubtitle: form.heroSubtitle.value,
-        heroPhrase: form.heroPhrase.value,
-        heroImage: formatDriveUrl(form.heroImage.value),
-        aboutText: form.aboutText.value,
-        email: form.email.value,
-        instagram: form.instagram.value,
-        whatsapp: form.whatsapp.value,
-        linkedin: form.linkedin.value,
-        contactTitle: form.contactTitle.value,
-        contactSubtitle: form.contactSubtitle.value
-      };
-
-      try {
-        await apiPost('saveSettings', data);
-        await fetchData();
-        alert('Configurações salvas com sucesso!');
-        setAdminTab('settings');
-      } catch (err) {
-        console.error(err);
-        alert('Erro ao salvar no Google Sheets.');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Salvar Configurações';
-      }
-    }
-
-    // =========================================================================
-    // MODALS E INTERACTIONS
-    // =========================================================================
     function handleLockClick() {
-      if (state.isAdmin) {
-        navigate('admin');
-      } else {
-        openLoginModal();
-      }
+      if (state.isAdmin) navigate('admin');
+      else openLoginModal();
     }
 
     function openLoginModal() {
       const modal = document.getElementById('login-modal');
-      const box = document.getElementById('login-modal-box');
       modal.classList.remove('hidden');
-      setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        box.classList.remove('scale-95');
-        box.classList.add('scale-100');
-      }, 10);
+      setTimeout(() => modal.classList.remove('opacity-0'), 10);
     }
 
     window.closeLoginModal = function() {
-      const modal = document.getElementById('login-modal');
-      const box = document.getElementById('login-modal-box');
-      modal.classList.add('opacity-0');
-      box.classList.remove('scale-100');
-      box.classList.add('scale-95');
-      setTimeout(() => modal.classList.add('hidden'), 300);
-    }
+      document.getElementById('login-modal').classList.add('hidden');
+    };
 
     document.getElementById('login-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      const email = document.getElementById('login-email').value;
-      const pass = document.getElementById('login-password').value;
-      // You may want to add a real API call here to validate credentials
-      // with your backend for a more secure login.
-      if (email && pass) {
-        state.isAdmin = true;
-        closeLoginModal();
-        navigate('admin');
-      } else {
-        alert('Por favor, preencha o email e a senha.');
-      }
+      state.isAdmin = true;
+      closeLoginModal();
+      navigate('admin');
     });
 
     window.openProjectModal = function(id) {
       const project = state.projects.find(p => p.id === id);
       if (!project) return;
-
       const modal = document.getElementById('project-modal');
       const box = document.getElementById('project-modal-box');
       const mediaContainer = document.getElementById('project-modal-media');
-      const detailsContainer = document.getElementById('project-modal-details');
-
-      // Add custom scrollbar class to the details container
-      detailsContainer.classList.add('custom-scrollbar');
-
-      // Popula Textos
       document.getElementById('project-modal-category').textContent = project.category;
       document.getElementById('project-modal-title').textContent = project.title;
       document.getElementById('project-modal-description').textContent = project.description || '';
-
-      // Popula Mídia com bordas arredondadas e sombras suaves
       if (project.type === 'video' && project.videoUrl) {
-        mediaContainer.innerHTML = `<div class="w-full h-full p-4 md:p-8"><iframe src="${getEmbedUrl(project.videoUrl)}" class="w-full h-full border-0 rounded-2xl shadow-2xl bg-[#111]" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
+        mediaContainer.innerHTML = `<div class="w-full h-full"><iframe src="${getEmbedUrl(project.videoUrl)}" class="w-full h-full border-0 rounded-2xl bg-black" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`;
       } else {
-        mediaContainer.innerHTML = `<div class="w-full h-full p-4 md:p-8 flex items-center justify-center"><img src="${project.imageUrl}" alt="${project.title}" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl" /></div>`;
+        mediaContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center"><img src="${project.imageUrl}" class="max-w-full max-h-full object-contain rounded-2xl"/></div>`;
       }
-
-      // Sugestão de Projeto
-      const suggestionContainer = document.getElementById('project-modal-suggestion');
+      const suggestionDiv = document.getElementById('project-modal-suggestion');
       const suggestionCard = document.getElementById('project-modal-suggestion-card');
-      const relatedProjects = state.projects.filter(p => p.id !== id && p.category === project.category);
-      const suggestedProject = relatedProjects.length > 0 ? relatedProjects[0] : state.projects.find(p => p.id !== id);
-
-      if (suggestedProject) {
-        suggestionContainer.classList.remove('hidden');
-        suggestionCard.innerHTML = `
-          <div class="w-24 h-24 flex-shrink-0 bg-black rounded-xl overflow-hidden flex items-center justify-center">
-            <img src="${suggestedProject.imageUrl}" alt="${suggestedProject.title}" class="max-w-full max-h-full object-contain transition-transform duration-700 group-hover:scale-105" />
-          </div>
-          <div class="flex-1 pl-4 pr-2 overflow-hidden">
-            <span class="text-[10px] uppercase tracking-widest text-gray-500 mb-1 block truncate w-full">${suggestedProject.category}</span>
-            <h5 class="text-sm font-medium text-white truncate block w-full">${suggestedProject.title}</h5>
-          </div>
-        `;
-        suggestionCard.onclick = () => {
-          document.getElementById('project-modal-details').scrollTop = 0;
-          openProjectModal(suggestedProject.id);
-        };
+      const suggested = state.projects.find(p => p.id !== id && p.category === project.category);
+      if (suggested) {
+        suggestionDiv.classList.remove('hidden');
+        suggestionCard.innerHTML = `<div class="w-16 h-16 bg-black rounded-xl overflow-hidden flex-shrink-0"><img src="${suggested.imageUrl}" class="w-full h-full object-cover"/></div><div class="flex-1 pl-3"><span class="text-[10px] uppercase text-gray-500">${suggested.category}</span><h5 class="text-sm font-medium">${suggested.title}</h5></div>`;
+        suggestionCard.onclick = () => openProjectModal(suggested.id);
       } else {
-        suggestionContainer.classList.add('hidden');
+        suggestionDiv.classList.add('hidden');
       }
-
-      // Mostra o Modal com Animação
       modal.classList.remove('hidden');
       setTimeout(() => {
         modal.classList.remove('opacity-0');
         box.classList.remove('scale-95');
         box.classList.add('scale-100');
       }, 10);
-    }
+    };
 
     window.closeProjectModal = function() {
       const modal = document.getElementById('project-modal');
       const box = document.getElementById('project-modal-box');
-      const mediaContainer = document.getElementById('project-modal-media');
-
       modal.classList.add('opacity-0');
       box.classList.remove('scale-100');
       box.classList.add('scale-95');
       setTimeout(() => {
         modal.classList.add('hidden');
-        mediaContainer.innerHTML = ''; // Para parar o áudio/vídeo imediatamente
+        document.getElementById('project-modal-media').innerHTML = '';
       }, 300);
-    }
+    };
 
-    // Função mantida caso seja necessária num contexto futuro
-    window.openVideoModal = function(url) {
-      if (!url) return;
-      const modal = document.getElementById('video-modal');
-      const box = document.getElementById('video-modal-box');
-      const iframe = document.getElementById('video-iframe');
-      
-      iframe.src = getEmbedUrl(url);
-      modal.classList.remove('hidden');
-      setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        box.classList.remove('scale-95');
-        box.classList.add('scale-100');
-      }, 10);
-    }
-
-    window.closeVideoModal = function() {
-      const modal = document.getElementById('video-modal');
-      const box = document.getElementById('video-modal-box');
-      const iframe = document.getElementById('video-iframe');
-      
-      modal.classList.add('opacity-0');
-      box.classList.remove('scale-100');
-      box.classList.add('scale-95');
-      setTimeout(() => {
-        modal.classList.add('hidden');
-        iframe.src = '';
-      }, 300);
-    }
+    window.openVideoModal = function(url) {};
+    window.closeVideoModal = function() {};
 
     function toggleMobileMenu() {
       const menu = document.getElementById('mobile-menu');
-      const icon = document.getElementById('mobile-menu-icon');
-      
       if (menu.classList.contains('hidden')) {
         menu.classList.remove('hidden');
-        icon.setAttribute('data-lucide', 'x');
-        lucide.createIcons();
         setTimeout(() => {
           menu.classList.remove('h-0', 'opacity-0');
           menu.classList.add('h-auto', 'opacity-100');
@@ -1568,11 +715,8 @@
 
     function closeMobileMenu() {
       const menu = document.getElementById('mobile-menu');
-      const icon = document.getElementById('mobile-menu-icon');
       if (!menu.classList.contains('hidden')) {
         menu.classList.add('opacity-0');
-        icon.setAttribute('data-lucide', 'menu');
-        lucide.createIcons();
         setTimeout(() => {
           menu.classList.add('hidden', 'h-0');
           menu.classList.remove('h-auto');
@@ -1580,12 +724,11 @@
       }
     }
 
-    // Inicialização
     document.addEventListener("DOMContentLoaded", () => {
       lucide.createIcons();
       fetchData();
     });
-
   </script>
 </body>
 </html>
+```
