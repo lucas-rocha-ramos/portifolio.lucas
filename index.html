@@ -38,7 +38,7 @@
       background-color: rgba(255, 255, 255, 0.3);
     }
 
-    /* Animações CSS para substituir o Framer Motion */
+    /* Animações CSS */
     .fade-in-up {
       opacity: 0;
       transform: translateY(30px);
@@ -71,9 +71,7 @@
       color: #000;
     }
 
-    /* ============================================================ */
     /* AJUSTE PARA VÍDEO NATIVO OCUPAR TODO O CANVAS */
-    /* ============================================================ */
     #project-modal-media video {
       width: 100% !important;
       height: 100% !important;
@@ -195,7 +193,7 @@
     <div id="loader-percentage" class="text-xs font-mono text-gray-600 mt-4 tracking-widest">0%</div>
   </div>
 
-  <!-- NAVBAR (Public) -->
+  <!-- NAVBAR -->
   <nav id="navbar" class="fixed top-0 w-full z-40 bg-black/40 backdrop-blur-xl border-b border-white/5 transition-all duration-300">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
       <button onclick="navigate('home')" class="text-xl font-bold tracking-tighter">
@@ -216,7 +214,6 @@
       </button>
     </div>
 
-    <!-- Mobile Menu -->
     <div id="mobile-menu" class="hidden md:hidden bg-black/95 backdrop-blur-xl border-b border-white/10 overflow-hidden transition-all duration-300 h-0 opacity-0">
       <div class="flex flex-col px-6 py-4 space-y-4">
         <button onclick="navigate('home')" class="text-left text-2xl font-light capitalize tracking-tight text-gray-300 hover:text-white">home</button>
@@ -231,26 +228,14 @@
 
   <!-- MAIN VIEWS -->
   <main id="main-content" class="pt-20">
-    <!-- HOME -->
     <div id="view-home" class="view-section hidden fade-in-up"></div>
-
-    <!-- DESIGNER -->
     <div id="view-designer" class="view-section hidden fade-in-up"></div>
-
-    <!-- VIDEO -->
     <div id="view-video" class="view-section hidden fade-in-up"></div>
-
-    <!-- FOTOGRAFIA -->
     <div id="view-fotografia" class="view-section hidden fade-in-up"></div>
-
-    <!-- SOBRE -->
     <div id="view-sobre" class="view-section hidden fade-in-up"></div>
-
-    <!-- CONTATO -->
     <div id="view-contato" class="view-section hidden fade-in-up"></div>
   </main>
 
-  <!-- ADMIN VIEW -->
   <div id="view-admin" class="hidden"></div>
 
   <!-- FOOTER -->
@@ -301,7 +286,7 @@
     </div>
   </div>
 
-  <!-- OLD VIDEO MODAL (Kept for compatibility if needed, but overridden by Project Modal below) -->
+  <!-- OLD VIDEO MODAL -->
   <div id="video-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
     <button onclick="closeVideoModal()" class="absolute top-6 right-6 text-white/50 hover:text-white bg-white/10 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 z-50">
       <i data-lucide="x" class="w-6 h-6"></i>
@@ -311,19 +296,15 @@
     </div>
   </div>
 
-  <!-- NEW PROJECT DETAILS MODAL -->
+  <!-- PROJECT DETAILS MODAL -->
   <div id="project-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-xl hidden opacity-0 transition-opacity duration-300">
     <button onclick="closeProjectModal()" class="absolute top-6 right-6 text-white/50 hover:text-white bg-white/10 w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 z-50">
       <i data-lucide="x" class="w-6 h-6"></i>
     </button>
     
     <div class="w-full max-w-7xl h-[90vh] md:h-[80vh] flex flex-col md:flex-row overflow-hidden rounded-3xl bg-[#0a0a0a] border border-white/10 transform scale-95 transition-transform duration-300 mx-4" id="project-modal-box">
-      <!-- Mídia (Esquerda no Desktop / Topo no Mobile) -->
-      <div class="w-full md:w-2/3 h-1/2 md:h-full bg-black relative flex items-center justify-center" id="project-modal-media">
-        <!-- Preenchido via JS dinamicamente (Imagem ou Video) -->
-      </div>
+      <div class="w-full md:w-2/3 h-1/2 md:h-full bg-black relative flex items-center justify-center" id="project-modal-media"></div>
       
-      <!-- Detalhes (Direita no Desktop / Embaixo no Mobile) -->
       <div id="project-modal-details" class="w-full md:w-1/3 h-1/2 md:h-full p-8 md:p-12 overflow-y-auto flex flex-col bg-[#111]">
         <div class="flex-1 mb-8">
           <span id="project-modal-category" class="text-xs uppercase tracking-[0.2em] font-medium text-gray-500 mb-4 block"></span>
@@ -331,12 +312,9 @@
           <p id="project-modal-description" class="text-base md:text-lg text-gray-400 font-light leading-relaxed whitespace-pre-wrap"></p>
         </div>
         
-        <!-- Sugestão -->
         <div id="project-modal-suggestion" class="border-t border-white/10 pt-8 hidden mt-auto">
           <h4 class="text-xs uppercase tracking-widest text-gray-500 mb-4">Veja também</h4>
-          <div id="project-modal-suggestion-card" class="group cursor-pointer flex items-center bg-[#1a1a1a] rounded-2xl p-3 border border-white/5 hover:border-white/20 transition-all">
-            <!-- Preenchido dinamicamente -->
-          </div>
+          <div id="project-modal-suggestion-card" class="group cursor-pointer flex items-center bg-[#1a1a1a] rounded-2xl p-3 border border-white/5 hover:border-white/20 transition-all"></div>
         </div>
       </div>
     </div>
@@ -351,7 +329,7 @@
     const DEFAULT_CATEGORIES = ['Nota de Falecimento', 'Igreja', 'Evento', 'Política', 'Comercial', 'Pessoal'];
     const MOCK_PROJECTS = [
       { id: '1', title: 'Campanha Minimalista', category: 'Comercial', type: 'arte', isFeatured: true, imageUrl: 'https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=1000', description: 'Uma campanha focada no minimalismo e na clareza da mensagem.', createdAt: Date.now() },
-      { id: '2', title: 'Lançamento de Produto', category: 'Evento', type: 'video', isFeatured: true, imageUrl: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&q=80&w=1000', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4', description: 'Vídeo cinematográfico criado para o lançamento de um produto inovador.', createdAt: Date.now() - 1000 },
+      { id: '2', title: 'Vídeo Institucional', category: 'Evento', type: 'video', isFeatured: true, imageUrl: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&q=80&w=1000', videoUrl: '', description: 'Vídeo institucional mostrando a essência da marca.', createdAt: Date.now() - 1000 },
       { id: '3', title: 'Identidade Visual', category: 'Política', type: 'arte', isFeatured: false, imageUrl: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&q=80&w=1000', description: 'Redesign de identidade visual focada em trazer mais seriedade.', createdAt: Date.now() - 2000 },
       { id: '4', title: 'Ensaio Urbano', category: 'Pessoal', type: 'foto', isFeatured: true, imageUrl: 'https://images.unsplash.com/photo-1511406361295-0a1ff814c0ce?auto=format&fit=crop&q=80&w=1000', description: 'Série de fotografias que capturam a essência do movimento na cidade grande.', createdAt: Date.now() - 3000 },
     ];
@@ -393,18 +371,23 @@
       return url;
     };
 
-    // Função para converter link do Google Drive em URL direta para a tag video
+    // FUNÇÃO CORRIGIDA PARA CONVERTER LINK DO GOOGLE DRIVE EM URL DIRETA
     const getDirectVideoUrl = (url) => {
       if (!url) return '';
+      
       // Verifica se é link do Google Drive
       const driveMatch = url.match(/(?:id=|d\/|file\/d\/)([a-zA-Z0-9_-]{25,})/);
       if (driveMatch && driveMatch[1]) {
-        return `https://drive.google.com/uc?export=download&id=${driveMatch[1]}`;
+        const fileId = driveMatch[1];
+        // URL direta para download do Google Drive
+        return `https://drive.google.com/uc?export=download&id=${fileId}`;
       }
-      // Se for URL direta de vídeo (mp4, webm, etc) retorna ela mesma
+      
+      // Se já for URL direta de vídeo
       if (url.match(/\.(mp4|webm|ogg|mov)$/i)) {
         return url;
       }
+      
       return url;
     };
 
@@ -548,7 +531,7 @@
     }
 
     // =========================================================================
-    // COMPONENTES PÚBLICOS
+    // RENDERIZAÇÃO DAS PÁGINAS
     // =========================================================================
     function renderHome() {
       const container = document.getElementById('view-home');
@@ -842,7 +825,7 @@
     }
 
     // =========================================================================
-    // ADMIN PANEL (RESUMIDO PARA NÃO SOBRESCREVER)
+    // ADMIN PANEL
     // =========================================================================
     function renderAdmin() {
       const container = document.getElementById('view-admin');
@@ -882,7 +865,7 @@
       navigate('admin');
     });
 
-    // Função principal que abre o modal - VERSÃO COM PLAYER NATIVO DE VÍDEO
+    // FUNÇÃO PRINCIPAL - ABRE MODAL COM PLAYER NATIVO PARA VÍDEOS DO GOOGLE DRIVE
     window.openProjectModal = function(id) {
       const project = state.projects.find(p => p.id === id);
       if (!project) return;
@@ -895,7 +878,7 @@
       document.getElementById('project-modal-title').textContent = project.title;
       document.getElementById('project-modal-description').textContent = project.description || '';
 
-      // Popula Mídia - Usando player nativo de vídeo para projetos do tipo video
+      // Verifica se é vídeo e tem URL
       if (project.type === 'video' && project.videoUrl) {
         const videoUrl = getDirectVideoUrl(project.videoUrl);
         mediaContainer.innerHTML = `
