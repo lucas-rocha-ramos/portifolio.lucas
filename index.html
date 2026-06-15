@@ -1,3 +1,8 @@
+Perfeito! Vamos usar o **Plyr** - um player de vídeo moderno, personalizável e com controles responsivos que se ajustam perfeitamente ao tamanho do canvas.
+
+Aqui está o código completo com o Plyr integrado para os vídeos do Google Drive:
+
+```html
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
@@ -10,6 +15,9 @@
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Plyr CSS para player de vídeo personalizado -->
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
   <style>
     /* Ocultar barra de scroll mas manter funcionalidade para carrosséis específicos */
@@ -71,13 +79,22 @@
       color: #000;
     }
 
-    /* AJUSTE PARA VÍDEO NATIVO OCUPAR TODO O CANVAS */
+    /* Ajuste para o Plyr player ocupar todo o canvas */
+    #project-modal-media .plyr {
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 0.75rem !important;
+      overflow: hidden !important;
+    }
+    
+    #project-modal-media .plyr__video-wrapper {
+      height: 100% !important;
+    }
+    
     #project-modal-media video {
       width: 100% !important;
       height: 100% !important;
       object-fit: contain !important;
-      background-color: #000 !important;
-      border-radius: 0.75rem !important;
     }
 
     #project-modal-media {
@@ -107,7 +124,7 @@
         min-height: 60vh !important;
       }
       
-      #project-modal-media video {
+      #project-modal-media .plyr {
         border-radius: 0.5rem !important;
       }
       
@@ -320,6 +337,9 @@
     </div>
   </div>
 
+  <!-- Plyr JS -->
+  <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+
   <script>
     // =========================================================================
     // CONFIGURAÇÃO E ESTADO GLOBAL
@@ -357,6 +377,9 @@
       }
     };
 
+    // Variável para armazenar a instância do Plyr atual
+    let currentPlyr = null;
+
     document.getElementById('current-year').textContent = new Date().getFullYear();
 
     // =========================================================================
@@ -371,19 +394,16 @@
       return url;
     };
 
-    // FUNÇÃO CORRIGIDA PARA CONVERTER LINK DO GOOGLE DRIVE EM URL DIRETA
+    // Converte link do Google Drive em URL direta
     const getDirectVideoUrl = (url) => {
       if (!url) return '';
       
-      // Verifica se é link do Google Drive
       const driveMatch = url.match(/(?:id=|d\/|file\/d\/)([a-zA-Z0-9_-]{25,})/);
       if (driveMatch && driveMatch[1]) {
         const fileId = driveMatch[1];
-        // URL direta para download do Google Drive
         return `https://drive.google.com/uc?export=download&id=${fileId}`;
       }
       
-      // Se já for URL direta de vídeo
       if (url.match(/\.(mp4|webm|ogg|mov)$/i)) {
         return url;
       }
@@ -865,7 +885,7 @@
       navigate('admin');
     });
 
-    // FUNÇÃO PRINCIPAL - ABRE MODAL COM PLAYER NATIVO PARA VÍDEOS DO GOOGLE DRIVE
+    // FUNÇÃO PRINCIPAL - ABRE MODAL COM PLYR PLAYER
     window.openProjectModal = function(id) {
       const project = state.projects.find(p => p.id === id);
       if (!project) return;
@@ -878,17 +898,37 @@
       document.getElementById('project-modal-title').textContent = project.title;
       document.getElementById('project-modal-description').textContent = project.description || '';
 
+      // Destroi instância anterior do Plyr se existir
+      if (currentPlyr) {
+        currentPlyr.destroy();
+        currentPlyr = null;
+      }
+
       // Verifica se é vídeo e tem URL
       if (project.type === 'video' && project.videoUrl) {
         const videoUrl = getDirectVideoUrl(project.videoUrl);
         mediaContainer.innerHTML = `
           <div class="w-full h-full flex items-center justify-center">
-            <video width="100%" height="100%" controls preload="metadata" style="max-width:100%; max-height:100%; object-fit:contain;">
+            <video id="plyr-video" controls preload="metadata" style="width:100%; height:100%; object-fit:contain;">
               <source src="${videoUrl}" type="video/mp4">
               Seu navegador não suporta a tag de vídeo.
             </video>
           </div>
         `;
+        
+        // Inicializa o Plyr player
+        setTimeout(() => {
+          const playerElement = document.getElementById('plyr-video');
+          if (playerElement) {
+            currentPlyr = new Plyr(playerElement, {
+              controls: ['play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'fullscreen'],
+              settings: ['quality', 'speed'],
+              invertTime: false,
+              keyboard: { focused: true, global: true },
+              tooltips: { controls: true, seek: true }
+            });
+          }
+        }, 100);
       } else {
         mediaContainer.innerHTML = `<div class="w-full h-full flex items-center justify-center"><img src="${project.imageUrl}" alt="${project.title}" class="max-w-full max-h-full object-contain rounded-2xl" /></div>`;
       }
@@ -930,6 +970,12 @@
       const modal = document.getElementById('project-modal');
       const box = document.getElementById('project-modal-box');
       const mediaContainer = document.getElementById('project-modal-media');
+
+      // Destroi a instância do Plyr
+      if (currentPlyr) {
+        currentPlyr.destroy();
+        currentPlyr = null;
+      }
 
       modal.classList.add('opacity-0');
       box.classList.remove('scale-100');
@@ -982,3 +1028,4 @@
   </script>
 </body>
 </html>
+```
